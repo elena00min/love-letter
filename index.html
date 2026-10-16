@@ -82,7 +82,6 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .audio-load{font:inherit;font-size:.85rem;width:100%;padding:10px 14px;border-radius:12px;border:1px dashed #c4a871;background:#fff3d6;color:#6e5e49;cursor:pointer;text-align:left}
 .audio-load:disabled{opacity:.7;cursor:wait}
 .bgm-btn{position:fixed;right:16px;bottom:16px;z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid #f6d36b88;background:#0b1d3acc;color:var(--gold);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px #0006;padding:0}
-.bgm-note{font-size:.78rem;color:#8a7a5a;margin:6px 0}
 #letter{padding-top:0}
 .topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 -16px 20px;padding:8px 16px;background:#0b1d3aef;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid #f6d36b44;color:var(--gold);letter-spacing:.14em;font-size:.95rem;font-weight:600;box-shadow:0 6px 18px #0004}
 .topbar .bottle{display:flex}.topbar .bottle svg{filter:drop-shadow(0 0 6px #f6d36b66)}
@@ -164,7 +163,6 @@ function viewerMain() {
     }
     if (!e.art && e.artRemote) card.append(h('div', 'media-ph', '🖼 插圖載入中…'));
     if (e.text) card.append(h('div', 'text', e.text));
-    if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂'));
     if (!e.images.length && e.imgRemote) card.append(h('div', 'media-ph', '🖼 照片載入中…'));
     if (e.images.length) {
       const g = h('div', 'imgs');
