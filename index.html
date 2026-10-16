@@ -86,6 +86,7 @@ button.open:hover{background:var(--gold);color:var(--night)}
 #letter{padding-top:0}
 .topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 -16px 20px;padding:8px 16px;background:#0b1d3aef;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid #f6d36b44;color:var(--gold);letter-spacing:.14em;font-size:.95rem;font-weight:600;box-shadow:0 6px 18px #0004}
 .topbar .bottle{display:flex}.topbar .bottle svg{filter:drop-shadow(0 0 6px #f6d36b66)}
+.media-ph{margin:12px 0;padding:18px;text-align:center;border:1px dashed #c4a871;border-radius:12px;color:#8a7a5a;font-size:.85rem;background:#fff3d6}
 #lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
 #lb img{max-width:96vw;max-height:96vh}
 </style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
@@ -148,7 +149,8 @@ function viewerMain() {
   letter.append(h('div', 'quote', '✦ 晚安，願你有星星陪著 ✦'));
 
   const pad = n => String(n).padStart(2, '0');
-  let selId = null, vy = 0, vm = 0, audioLoader = null;
+  let selId = null, vy = 0, vm = 0, audioLoader = null, mediaLoader = null;
+  const mediaCache = new Map(), mediaBusy = new Set();
   function entryCard(e, n) {
     const d = new Date(e.date + 'T00:00:00'), card = h('div', 'entry');
     card.append(h('div', 'chap', ROMAN(n)));
@@ -160,8 +162,10 @@ function viewerMain() {
       const scene = h('div', 'diary-scene'), si = pic(e.art, 'diary-illustration');
       si.alt = '日記插畫'; scene.append(si); card.append(scene);
     }
+    if (!e.art && e.artRemote) card.append(h('div', 'media-ph', '🖼 插圖載入中…'));
     if (e.text) card.append(h('div', 'text', e.text));
     if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂'));
+    if (!e.images.length && e.imgRemote) card.append(h('div', 'media-ph', '🖼 照片載入中…'));
     if (e.images.length) {
       const g = h('div', 'imgs');
       for (const src of e.images) { const i = h('img'); i.src = src; i.loading = 'lazy'; i.onclick = () => { lbImg.src = src; lb.style.display = 'flex'; }; g.append(i); }
@@ -210,7 +214,7 @@ function viewerMain() {
       nv.append(pb, h('span', '', '第 ' + (idx + 1) + ' 篇 / 共 ' + chrono.length + ' 篇'), nb);
     }
     box.append(entryCard(cur, idx + 1));
-    curEntry = cur; playFor(cur);
+    curEntry = cur; playFor(cur); ensureMedia(cur);
   }
 
   const lb = h('div'); lb.id = 'lb'; const lbImg = h('img'); lb.append(lbImg); lb.onclick = () => lb.style.display = 'none';
@@ -232,6 +236,14 @@ function viewerMain() {
     app.append(bgmBtn);
   };
   let curEntry = null;
+  async function ensureMedia(e) {
+    if (!(e.artRemote || e.imgRemote) || !mediaLoader || mediaBusy.has(e.id)) return;
+    mediaBusy.add(e.id);
+    try { const m = await mediaLoader(e.id); mediaCache.set(e.id, { art: m.art || '', images: m.images || [] }); e.art = m.art || ''; e.images = m.images || []; e.artRemote = e.imgRemote = false; }
+    catch (err) { mediaBusy.delete(e.id); return; }
+    mediaBusy.delete(e.id);
+    if (selId === e.id) draw();
+  }
   async function playFor(e) {
     if (!opened) return;
     if (!e.audio && !e.audioRemote) { if (bgm) bgm.pause(); bgmId = null; if (bgmBtn) bgmBtn.style.display = 'none'; return; }
@@ -260,11 +272,16 @@ function viewerMain() {
       if (!r.ok) throw new Error(r.status);
       return JSON.parse(await r.text());
     };
+    mediaLoader = async id => {
+      const r = await fetch(D.live.url + '/rest/v1/rpc/letter_media', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: pw, p_id: id }) });
+      if (!r.ok) throw new Error(r.status);
+      return JSON.parse(await r.text());
+    };
     const fetchAll = async p => {
       const r = await fetch(D.live.url + '/rest/v1/rpc/letter_read', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p }) });
       const t = await r.text();
       if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
-      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', art: x.art || '', images: x.images || [], audio: '', audioRemote: !!x.has_audio, audioKb: x.audio_kb || 0, audioName: x.audio_name || '' }));
+      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', art: (mediaCache.get(x.id) || {}).art || '', images: (mediaCache.get(x.id) || {}).images || [], artRemote: !!x.has_art && !mediaCache.has(x.id), imgRemote: x.n_images > 0 && !mediaCache.has(x.id), audio: '', audioRemote: !!x.has_audio, audioKb: x.audio_kb || 0, audioName: x.audio_name || '' }));
       last = Date.now(); pw = p; draw();
     };
     ob.onclick = async () => {
