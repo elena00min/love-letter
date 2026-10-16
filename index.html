@@ -80,6 +80,8 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .pw{font:inherit;width:min(260px,70vw);padding:10px 16px;border-radius:99px;border:1px solid #f6d36b88;background:#0b1d3a99;color:#fff;text-align:center;margin:0 0 14px;position:relative;outline:none}
 .pw:focus{border-color:var(--gold)}
 .pwmsg{color:#ff9aa2;font-size:.85rem;margin-top:10px;min-height:1.2em;position:relative}
+.audio-load{font:inherit;font-size:.85rem;width:100%;padding:10px 14px;border-radius:12px;border:1px dashed #c4a871;background:#fff3d6;color:#6e5e49;cursor:pointer;text-align:left}
+.audio-load:disabled{opacity:.7;cursor:wait}
 #lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
 #lb img{max-width:96vw;max-height:96vh}
 </style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
@@ -159,7 +161,7 @@ function viewerMain() {
   letter.append(h('div', 'quote', '✦ 晚安，願你有星星陪著 ✦'));
 
   const pad = n => String(n).padStart(2, '0');
-  let selId = null, vy = 0, vm = 0;
+  let selId = null, vy = 0, vm = 0, audioLoader = null;
   function entryCard(e, n) {
     const d = new Date(e.date + 'T00:00:00'), card = h('div', 'entry');
     card.append(h('div', 'chap', ROMAN(n)));
@@ -174,6 +176,15 @@ function viewerMain() {
     if (e.text) card.append(h('div', 'text', e.text));
     if (e.music) { const me = musicEl(e.music); if (me) card.append(me); }
     if (e.audio) { const ab = h('div', 'music'), au = h('audio'); au.controls = true; au.preload = 'none'; au.src = e.audio; au.style.width = '100%'; ab.append(au, h('a', '', '🎧 ' + (e.audioName || '音檔'))); card.append(ab); }
+    if (e.audioRemote && audioLoader) {
+      const ab = h('div', 'music'), lb2 = h('button', 'audio-load', '🎧 載入音檔' + (e.audioName ? '：' + e.audioName : '') + '（約 ' + (e.audioKb > 1024 ? (e.audioKb / 1024).toFixed(1) + ' MB' : e.audioKb + ' KB') + '，點一下載入）');
+      lb2.onclick = async () => {
+        lb2.disabled = true; lb2.textContent = '載入中，請稍候…';
+        try { const au = h('audio'); au.controls = true; au.src = await audioLoader(e.id); au.style.width = '100%'; lb2.replaceWith(au); au.play().catch(() => {}); }
+        catch (err) { lb2.disabled = false; lb2.textContent = '載入失敗，點一下重試'; }
+      };
+      ab.append(lb2); card.append(ab);
+    }
     if (e.images.length) {
       const g = h('div', 'imgs');
       for (const src of e.images) { const i = h('img'); i.src = src; i.loading = 'lazy'; i.onclick = () => { lbImg.src = src; lb.style.display = 'flex'; }; g.append(i); }
@@ -232,11 +243,16 @@ function viewerMain() {
     const msg = h('div', 'pwmsg');
     cover.insertBefore(pin, ob); cover.append(msg);
     let last = 0;
+    audioLoader = async id => {
+      const r = await fetch(D.live.url + '/rest/v1/rpc/letter_audio', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: pw, p_id: id }) });
+      if (!r.ok) throw new Error(r.status);
+      return JSON.parse(await r.text());
+    };
     const fetchAll = async p => {
       const r = await fetch(D.live.url + '/rest/v1/rpc/letter_read', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p }) });
       const t = await r.text();
       if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
-      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', music: x.music || '', art: x.art || '', images: x.images || [], audio: x.audio || '', audioName: x.audio_name || '' }));
+      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', music: x.music || '', art: x.art || '', images: x.images || [], audio: '', audioRemote: !!x.has_audio, audioKb: x.audio_kb || 0, audioName: x.audio_name || '' }));
       last = Date.now(); pw = p; draw();
     };
     ob.onclick = async () => {
