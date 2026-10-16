@@ -83,6 +83,7 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .audio-load{font:inherit;font-size:.85rem;width:100%;padding:10px 14px;border-radius:12px;border:1px dashed #c4a871;background:#fff3d6;color:#6e5e49;cursor:pointer;text-align:left}
 .audio-load:disabled{opacity:.7;cursor:wait}
 .bgm-btn{position:fixed;right:16px;bottom:16px;z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid #f6d36b88;background:#0b1d3acc;color:var(--gold);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px #0006;padding:0}
+.bgm-note{font-size:.78rem;color:#8a7a5a;margin:6px 0}
 #lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
 #lb img{max-width:96vw;max-height:96vh}
 </style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
@@ -181,16 +182,7 @@ function viewerMain() {
     }
     if (e.text) card.append(h('div', 'text', e.text));
     if (e.music) { const me = musicEl(e.music); if (me) card.append(me); }
-    if (e.audio) { const ab = h('div', 'music'), au = h('audio'); au.controls = true; au.preload = 'none'; au.src = e.audio; au.style.width = '100%'; ab.append(au, h('a', '', '🎧 ' + (e.audioName || '音檔'))); card.append(ab); }
-    if (e.audioRemote && audioLoader) {
-      const ab = h('div', 'music'), lb2 = h('button', 'audio-load', '🎧 載入音檔' + (e.audioName ? '：' + e.audioName : '') + '（約 ' + (e.audioKb > 1024 ? (e.audioKb / 1024).toFixed(1) + ' MB' : e.audioKb + ' KB') + '，點一下載入）');
-      lb2.onclick = async () => {
-        lb2.disabled = true; lb2.textContent = '載入中，請稍候…';
-        try { const au = h('audio'); au.controls = true; au.src = await audioLoader(e.id); au.style.width = '100%'; lb2.replaceWith(au); au.play().catch(() => {}); }
-        catch (err) { lb2.disabled = false; lb2.textContent = '載入失敗，點一下重試'; }
-      };
-      ab.append(lb2); card.append(ab);
-    }
+    if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂' + (e.audioName ? '：' + e.audioName : '')));
     if (e.images.length) {
       const g = h('div', 'imgs');
       for (const src of e.images) { const i = h('img'); i.src = src; i.loading = 'lazy'; i.onclick = () => { lbImg.src = src; lb.style.display = 'flex'; }; g.append(i); }
@@ -237,28 +229,45 @@ function viewerMain() {
       nv.append(pb, h('span', '', '第 ' + (idx + 1) + ' 篇 / 共 ' + chrono.length + ' 篇'), nb);
     }
     box.append(entryCard(cur, idx + 1));
+    curEntry = cur; playFor(cur);
   }
 
   const lb = h('div'); lb.id = 'lb'; const lbImg = h('img'); lb.append(lbImg); lb.onclick = () => lb.style.display = 'none';
   app.append(cover, letter, lb);
   document.body.prepend(stars(34), petals(9));
   const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
-  let bgm = null, bgmBtn = null;
+  let bgm = null, bgmBtn = null, bgmWanted = true, bgmId = null, opened = false;
+  const audioCache = new Map();
   const mkBgm = () => { if (!bgm) { bgm = new Audio(); bgm.loop = true; bgm.volume = 0.5; } return bgm; };
   const unlockBgm = () => { mkBgm(); if (!bgm.src) { bgm.src = SILENT; bgm.play().catch(() => {}); } };
   const setBgmBtn = () => { if (bgmBtn) bgmBtn.textContent = bgm && !bgm.paused ? '🎵' : '🔇'; };
-  const startBgm = src => {
-    if (!src) return;
-    mkBgm().src = src;
-    bgm.play().then(setBgmBtn, setBgmBtn);
-    if (!bgmBtn) {
-      bgmBtn = h('button', 'bgm-btn'); bgmBtn.title = '背景音樂（點一下暫停／播放）';
-      bgmBtn.onclick = () => { if (bgm.paused) bgm.play().then(setBgmBtn, setBgmBtn); else { bgm.pause(); setBgmBtn(); } };
-      app.append(bgmBtn);
-    }
-    setBgmBtn();
+  const ensureBgmBtn = () => {
+    if (bgmBtn) return;
+    bgmBtn = h('button', 'bgm-btn'); bgmBtn.title = '這篇的背景音樂（點一下暫停／播放）';
+    bgmBtn.onclick = () => {
+      if (bgm && !bgm.paused) { bgm.pause(); bgmWanted = false; setBgmBtn(); }
+      else { bgmWanted = true; if (bgm && bgm.src && bgm.src !== SILENT) bgm.play().then(setBgmBtn, setBgmBtn); else { bgmId = null; if (curEntry) playFor(curEntry); } }
+    };
+    app.append(bgmBtn);
   };
-  const openLetter = () => { cover.classList.add('gone'); letter.classList.add('show'); scrollTo(0, 0); };
+  let curEntry = null;
+  async function playFor(e) {
+    if (!opened) return;
+    if (!e.audio && !e.audioRemote) { if (bgm) bgm.pause(); bgmId = null; if (bgmBtn) bgmBtn.style.display = 'none'; return; }
+    ensureBgmBtn(); bgmBtn.style.display = '';
+    if (bgmId === e.id) return;
+    bgmId = e.id; mkBgm().pause();
+    let src = e.audio || audioCache.get(e.id);
+    if (!src) {
+      bgmBtn.textContent = '⏳';
+      try { src = await audioLoader(e.id); audioCache.set(e.id, src); }
+      catch (err) { if (bgmId === e.id) { bgmId = null; bgmBtn.textContent = '⚠️'; } return; }
+    }
+    if (bgmId !== e.id) return;
+    bgm.src = src;
+    if (bgmWanted) bgm.play().then(setBgmBtn, setBgmBtn); else setBgmBtn();
+  }
+  const openLetter = () => { cover.classList.add('gone'); letter.classList.add('show'); scrollTo(0, 0); opened = true; if (curEntry) playFor(curEntry); };
   if (D.live) {
     let pw = ''; try { pw = localStorage.getItem('ll_view') || ''; } catch (e) {}
     const pin = h('input', 'pw'); pin.type = 'password'; pin.placeholder = '請輸入閱讀密碼'; pin.value = pw; pin.autocomplete = 'off';
@@ -285,13 +294,12 @@ function viewerMain() {
         await fetchAll(pin.value);
         try { localStorage.setItem('ll_view', pin.value); } catch (e) {}
         openLetter();
-        fetch(D.live.url + '/rest/v1/rpc/letter_bgm', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: pin.value }) }).then(r => r.ok ? r.text() : null).then(t => t && startBgm(JSON.parse(t))).catch(() => {});
         if (!D.entries.length) box.append(h('div', 'quote', '還沒有內容，晚點再來看看 ✦'));
       } catch (e) { msg.textContent = e.message === 'wrong' ? '密碼不對喔' : e.message === 'closed' ? '信還沒有開放閱讀' : '暫時讀不到，請稍後再試'; }
       ob.disabled = false; ob.textContent = '拆開信';
     };
     pin.onkeydown = ev => { if (ev.key === 'Enter') ob.click(); };
     document.addEventListener('visibilitychange', () => { if (!document.hidden && pw && Date.now() - last > 120000) fetchAll(pw).catch(() => {}); });
-  } else { ob.onclick = () => { openLetter(); startBgm(D.bgm); }; draw(); }
+  } else { ob.onclick = openLetter; draw(); }
 }
 viewerMain();</script></body></html>
