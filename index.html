@@ -174,7 +174,7 @@ function viewerMain() {
     box.textContent = ''; cal.textContent = ''; navTop.textContent = ''; navBot.textContent = '';
     cal.style.display = navTop.style.display = navBot.style.display = chrono.length ? '' : 'none';
     topbar.textContent = ''; topbar.style.display = chrono.length ? '' : 'none';
-    if (chrono.length) topbar.append(svgBox(BOTTLE_SVG, 'bottle'), h('span', '', '累計 ' + chrono.length + ' 封情書'));
+    if (chrono.length) topbar.append(svgBox(BOTTLE_SVG, 'bottle'), h('span', '', '思念累積了' + chrono.length + '封'));
     if (!chrono.length) return;
     let idx = chrono.findIndex(e => e.id === selId); if (idx < 0) idx = chrono.length - 1;
     const cur = chrono[idx]; selId = cur.id;
