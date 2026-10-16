@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>寫給你的每一天</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Georama:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap"><style>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>寫給你的每一天</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Georama:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" media="print" data-m="all" onload="this.media=this.dataset.m"><style>
 :root{--night:#0b1d3a;--navy:#0f3963;--gold:#f6d36b;--cream:#f5eddc;--ink:#1c2f4a;--muted:#8a7a5a}
 *{box-sizing:border-box}
 body{margin:0;color:var(--ink);font:17px/1.95 "Georama","Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(#0b1d3a,#0f3963 55%,#17507f) fixed}
@@ -82,6 +82,7 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .pwmsg{color:#ff9aa2;font-size:.85rem;margin-top:10px;min-height:1.2em;position:relative}
 .audio-load{font:inherit;font-size:.85rem;width:100%;padding:10px 14px;border-radius:12px;border:1px dashed #c4a871;background:#fff3d6;color:#6e5e49;cursor:pointer;text-align:left}
 .audio-load:disabled{opacity:.7;cursor:wait}
+.bgm-btn{position:fixed;right:16px;bottom:16px;z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid #f6d36b88;background:#0b1d3acc;color:var(--gold);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px #0006;padding:0}
 #lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
 #lb img{max-width:96vw;max-height:96vh}
 </style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
@@ -134,6 +135,11 @@ function viewerMain() {
     if (m) { src = 'https://www.youtube.com/embed/' + m[0]; height = 220; }
     else if (host === 'open.spotify.com' && (m = u.pathname.match(/\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/))) {
       src = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2]; height = m[1] === 'track' || m[1] === 'episode' ? 152 : 352;
+    } else if (/(^|\.)music\.163\.com$/.test(u.hostname) && (m = (u.searchParams.get('id') || new URLSearchParams((u.hash.split('?')[1] || '')).get('id') || '').match(/^\d+$/))) {
+      const kind = /playlist/.test(u.pathname + u.hash) ? 0 : /album/.test(u.pathname + u.hash) ? 1 : 2;
+      src = 'https://music.163.com/outchain/player?type=' + kind + '&id=' + m[0] + '&auto=0&height=' + (kind === 2 ? 66 : 430); height = kind === 2 ? 86 : 450;
+    } else if (host === 'bilibili.com' && (m = u.pathname.match(/\/video\/(BV[0-9A-Za-z]+)/))) {
+      src = 'https://player.bilibili.com/player.html?bvid=' + m[1] + '&page=1&high_quality=1&autoplay=0'; height = 300;
     } else if (/\.(mp3|m4a|wav|ogg|aac)$/i.test(u.pathname)) audio = true;
     if (audio) { const a = h('audio'); a.controls = true; a.preload = 'none'; a.src = u.href; a.style.width = '100%'; box.append(a); }
     else if (src) {
@@ -236,6 +242,22 @@ function viewerMain() {
   const lb = h('div'); lb.id = 'lb'; const lbImg = h('img'); lb.append(lbImg); lb.onclick = () => lb.style.display = 'none';
   app.append(cover, letter, lb);
   document.body.prepend(stars(34), petals(9));
+  const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+  let bgm = null, bgmBtn = null;
+  const mkBgm = () => { if (!bgm) { bgm = new Audio(); bgm.loop = true; bgm.volume = 0.5; } return bgm; };
+  const unlockBgm = () => { mkBgm(); if (!bgm.src) { bgm.src = SILENT; bgm.play().catch(() => {}); } };
+  const setBgmBtn = () => { if (bgmBtn) bgmBtn.textContent = bgm && !bgm.paused ? '🎵' : '🔇'; };
+  const startBgm = src => {
+    if (!src) return;
+    mkBgm().src = src;
+    bgm.play().then(setBgmBtn, setBgmBtn);
+    if (!bgmBtn) {
+      bgmBtn = h('button', 'bgm-btn'); bgmBtn.title = '背景音樂（點一下暫停／播放）';
+      bgmBtn.onclick = () => { if (bgm.paused) bgm.play().then(setBgmBtn, setBgmBtn); else { bgm.pause(); setBgmBtn(); } };
+      app.append(bgmBtn);
+    }
+    setBgmBtn();
+  };
   const openLetter = () => { cover.classList.add('gone'); letter.classList.add('show'); scrollTo(0, 0); };
   if (D.live) {
     let pw = ''; try { pw = localStorage.getItem('ll_view') || ''; } catch (e) {}
@@ -258,17 +280,18 @@ function viewerMain() {
     ob.onclick = async () => {
       msg.textContent = '';
       if (!pin.value) { msg.textContent = '請先輸入密碼'; return; }
-      ob.disabled = true; ob.textContent = '確認中…';
+      unlockBgm(); ob.disabled = true; ob.textContent = '確認中…';
       try {
         await fetchAll(pin.value);
         try { localStorage.setItem('ll_view', pin.value); } catch (e) {}
         openLetter();
+        fetch(D.live.url + '/rest/v1/rpc/letter_bgm', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: pin.value }) }).then(r => r.ok ? r.text() : null).then(t => t && startBgm(JSON.parse(t))).catch(() => {});
         if (!D.entries.length) box.append(h('div', 'quote', '還沒有內容，晚點再來看看 ✦'));
       } catch (e) { msg.textContent = e.message === 'wrong' ? '密碼不對喔' : e.message === 'closed' ? '信還沒有開放閱讀' : '暫時讀不到，請稍後再試'; }
       ob.disabled = false; ob.textContent = '拆開信';
     };
     pin.onkeydown = ev => { if (ev.key === 'Enter') ob.click(); };
     document.addEventListener('visibilitychange', () => { if (!document.hidden && pw && Date.now() - last > 120000) fetchAll(pw).catch(() => {}); });
-  } else { ob.onclick = openLetter; draw(); }
+  } else { ob.onclick = () => { openLetter(); startBgm(D.bgm); }; draw(); }
 }
 viewerMain();</script></body></html>
