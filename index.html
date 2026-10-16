@@ -83,6 +83,9 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .audio-load:disabled{opacity:.7;cursor:wait}
 .bgm-btn{position:fixed;right:16px;bottom:16px;z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid #f6d36b88;background:#0b1d3acc;color:var(--gold);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 16px #0006;padding:0}
 .bgm-note{font-size:.78rem;color:#8a7a5a;margin:6px 0}
+#letter{padding-top:0}
+.topbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:center;gap:10px;margin:0 -16px 20px;padding:8px 16px;background:#0b1d3aef;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid #f6d36b44;color:var(--gold);letter-spacing:.14em;font-size:.95rem;font-weight:600;box-shadow:0 6px 18px #0004}
+.topbar .bottle{display:flex}.topbar .bottle svg{filter:drop-shadow(0 0 6px #f6d36b66)}
 #lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
 #lb img{max-width:96vw;max-height:96vh}
 </style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
@@ -98,6 +101,7 @@ const STAR_PATH = '<svg width="S" height="S" viewBox="0 0 20 20"><path d="M10 0l
 const ROSE_SVG = '<svg width="34" height="34" viewBox="0 0 40 40"><path d="M20 38C20 30 21 26 20 22" stroke="#4aa86b" stroke-width="2.2" fill="none"/><path d="M20 32q-9-1-10-8q8 0 10 8z" fill="#7fc48c" stroke="#2f6b4a"/><circle cx="20" cy="14" r="9" fill="#d9434a" stroke="#6b1f2a" stroke-width="1.2"/><path d="M14 14q6-7 12 0M16 17q4-4 8 0" stroke="#8f2a35" stroke-width="1.2" fill="none"/><circle cx="17" cy="10.5" r="2" fill="#ee858a"/></svg>';
 const PETAL_SVG = '<svg width="W" height="H" viewBox="0 0 14 18"><path d="M7 0C14 5 14 14 7 18C0 14 0 5 7 0Z" fill="#e4565b" fill-opacity=".85"/><path d="M7 3V15" stroke="#b83a43" stroke-width=".7"/></svg>';
 const LUCK_SVG = '<svg width="150" height="170" viewBox="0 0 120 140"><path d="M60 68C60 92 50 112 66 132" stroke="#3f8f5a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M63 112q16-6 20-20q-14 2-20 20z" fill="#5fb87d" stroke="#2f6b4a" stroke-width="1"/><g transform="translate(60 62)"><g id="lf"><path d="M0 0C-16-6-26-24-14-36C-7-43 0-37 0-30C0-37 7-43 14-36C26-24 16-6 0 0Z" fill="#5fb87d" stroke="#2f6b4a" stroke-width="1.2"/><path d="M0-3V-27" stroke="#2f6b4a" stroke-width="1.2" opacity=".6"/></g><use href="#lf" transform="rotate(90)"/><use href="#lf" transform="rotate(180)"/><use href="#lf" transform="rotate(270)"/></g><circle cx="60" cy="62" r="4" fill="#f6d36b"/><path d="M20 26l2.4 6.4 6.4 2.4-6.4 2.4L20 44l-2.4-6.4-6.4-2.4 6.4-2.4z" fill="#f6d36b"/><path d="M102 18l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#f6d36b"/><path d="M100 96l1.8 4.4 4.4 1.8-4.4 1.8-1.8 4.4-1.8-4.4-4.4-1.8 4.4-1.8z" fill="#f6d36b"/></svg>';
+const BOTTLE_SVG = '<svg width="34" height="48" viewBox="0 0 40 56"><rect x="15" y="1.5" width="10" height="8" rx="2" fill="#c89b6a" stroke="#8a5f35" stroke-width="1"/><path d="M16 9.5V16C16 20 8 22 8 30V46C8 51 12 54.5 17 54.5H23C28 54.5 32 51 32 46V30C32 22 24 20 24 16V9.5" fill="#cfe3f0" fill-opacity=".16" stroke="#cfe3f0" stroke-width="1.6"/><g transform="rotate(-18 20 42)"><rect x="12" y="36" width="16" height="11" rx="1.5" fill="#fff3d6" stroke="#c4a871" stroke-width="1"/><path d="M12 36.5L20 42.5L28 36.5" fill="none" stroke="#c4a871" stroke-width="1"/><circle cx="20" cy="42.5" r="1.6" fill="#d9434a"/></g><path d="M14 45L27 38L29 41.5L16 48.5Z" fill="#f5eddc" stroke="#c4a871" stroke-width="1" opacity=".95"/><path d="M12 28C11 33 11 40 12 46" stroke="#fff" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 const ROMAN = n => { let r = '', m = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; for (const [v, s] of m) while (n >= v) { r += s; n -= v; } return r; };
 function viewerMain() {
   const D = JSON.parse(document.getElementById('data').textContent), s = D.settings;
@@ -138,7 +142,8 @@ function viewerMain() {
   const cal = h('div', 'cal'), navTop = h('div', 'diary-nav'), navBot = h('div', 'diary-nav'), box = h('div');
   const endScene = h('div', 'ending-scene');
   endScene.append(svgBox(LUCK_SVG, 'dome'), h('p', '', '你是我獨一無二的幸運。'));
-  letter.append(head, cal, navTop, box, navBot, endScene);
+  const topbar = h('div', 'topbar');
+  letter.append(topbar, head, cal, navTop, box, navBot, endScene);
   if (s.from) letter.append(h('div', 'sign', '— ' + s.from));
   letter.append(h('div', 'quote', '✦ 晚安，願你有星星陪著 ✦'));
 
@@ -156,7 +161,7 @@ function viewerMain() {
       si.alt = '日記插畫'; scene.append(si); card.append(scene);
     }
     if (e.text) card.append(h('div', 'text', e.text));
-    if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂' + (e.audioName ? '：' + e.audioName : '')));
+    if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂'));
     if (e.images.length) {
       const g = h('div', 'imgs');
       for (const src of e.images) { const i = h('img'); i.src = src; i.loading = 'lazy'; i.onclick = () => { lbImg.src = src; lb.style.display = 'flex'; }; g.append(i); }
@@ -168,6 +173,8 @@ function viewerMain() {
     const chrono = [...D.entries].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
     box.textContent = ''; cal.textContent = ''; navTop.textContent = ''; navBot.textContent = '';
     cal.style.display = navTop.style.display = navBot.style.display = chrono.length ? '' : 'none';
+    topbar.textContent = ''; topbar.style.display = chrono.length ? '' : 'none';
+    if (chrono.length) topbar.append(svgBox(BOTTLE_SVG, 'bottle'), h('span', '', '共 ' + chrono.length + ' 篇日記'));
     if (!chrono.length) return;
     let idx = chrono.findIndex(e => e.id === selId); if (idx < 0) idx = chrono.length - 1;
     const cur = chrono[idx]; selId = cur.id;
