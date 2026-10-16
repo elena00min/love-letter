@@ -1,0 +1,258 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>寫給你的每一天</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Georama:wght@400;600&family=Noto+Sans+TC:wght@400;700&family=Playfair+Display:ital,wght@1,500;1,600&display=swap"><style>
+:root{--night:#0b1d3a;--navy:#0f3963;--gold:#f6d36b;--cream:#f5eddc;--ink:#1c2f4a;--muted:#8a7a5a}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:17px/1.95 "Georama","Noto Sans TC","Microsoft JhengHei",sans-serif;background:linear-gradient(#0b1d3a,#0f3963 55%,#17507f) fixed}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.stars svg{position:absolute;filter:drop-shadow(0 0 5px #f6d36bcc);animation:tw 3.5s ease-in-out infinite}
+@keyframes tw{50%{opacity:.3;transform:scale(.75)}}
+#cover,#letter{position:relative;z-index:1}
+#cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:opacity .8s}
+#cover.gone{opacity:0;pointer-events:none;position:absolute;inset:0;z-index:0}
+.planet{animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 22px #f6d36b66)}
+@keyframes float{50%{transform:translateY(-12px)}}
+.latin{font-family:"Playfair Display","Cormorant Garamond",Georgia,serif;font-style:italic;color:var(--gold);font-size:2.1rem;line-height:1.2;margin-top:14px;text-shadow:0 0 14px #f6d36b55}
+#cover h1{font-size:1.5rem;margin:6px 0 4px;color:var(--gold);letter-spacing:.2em;font-weight:700}
+#cover p{margin:0 0 26px;color:#c9d9ea;font-size:.95rem}
+.rule{display:flex;align-items:center;gap:10px;color:var(--gold);font-size:.8rem;letter-spacing:.2em;margin:6px 0 22px}
+.rule:before,.rule:after{content:"";width:60px;border-top:1px solid #f6d36b99}
+button.open{font:inherit;font-weight:600;background:transparent;color:var(--gold);border:1.5px solid var(--gold);border-radius:99px;padding:11px 38px;cursor:pointer;letter-spacing:.2em;box-shadow:0 0 18px #f6d36b44;transition:.2s}
+button.open:hover{background:var(--gold);color:var(--night)}
+#letter{display:none;max-width:660px;margin:0 auto;padding:40px 16px 90px}
+#letter.show{display:block;animation:fade 1s}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}}
+.head{text-align:center;margin-bottom:34px}
+.head .latin{font-size:1.9rem;margin:0}
+.head h1{margin:2px 0 0;color:var(--gold);font-size:1.3rem;letter-spacing:.25em}
+.head button{font:inherit;font-size:.78rem;background:none;border:1px solid #f6d36b88;color:var(--gold);border-radius:99px;padding:2px 14px;cursor:pointer;margin-top:12px}
+.entry{background:var(--cream);border-radius:14px;padding:26px 26px 24px;position:relative;overflow:hidden;box-shadow:0 10px 30px #00000055;background-image:radial-gradient(#e6dcc3 1px,transparent 1px);background-size:14px 14px}
+.chap{font-size:.75rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.dt{display:flex;align-items:baseline;gap:12px;margin:2px 0 6px;flex-wrap:wrap}
+.big{font-family:"Playfair Display",Georgia,serif;font-style:italic;font-weight:600;font-size:2.4rem;line-height:1.1;color:var(--navy)}
+.sub{font-family:"Playfair Display",Georgia,serif;font-style:italic;color:var(--muted);font-size:.95rem}
+.mood{margin-left:auto;font-size:1.6rem}
+.text{white-space:pre-wrap;word-break:break-word;margin:12px 0}
+.music{margin:18px 0 6px;position:relative;z-index:1}.music iframe{display:block;width:100%;border:0;border-radius:12px}.music a{display:block;font-size:.78rem;color:var(--muted);margin-top:6px;text-decoration:none}
+.imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
+.imgs img{width:100%;border-radius:6px;cursor:zoom-in;display:block;border:6px solid #fff;box-shadow:0 3px 10px #0003}
+.imgs img:nth-child(odd){transform:rotate(-1deg)}.imgs img:nth-child(even){transform:rotate(1deg)}
+.sign{text-align:right;color:var(--gold);margin-top:30px;font-size:1.05rem;letter-spacing:.1em}
+.quote{text-align:center;color:#c9d9ea;font-size:.85rem;margin-top:44px}
+.petals{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.petals svg{position:absolute;top:-30px;animation:fall linear infinite}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(34px,55vh) rotate(200deg)}100%{transform:translate(-12px,112vh) rotate(380deg)}}
+.dome{text-align:center;margin-top:36px}.dome svg{filter:drop-shadow(0 0 14px #e4565b66)}
+.entry{background-color:#fff8e8;background-image:radial-gradient(#dbc8a665 0.65px,transparent 0.65px);background-size:12px 12px;border:1px solid #fff6de;box-shadow:0 10px 38px #0006, inset 0 0 0 5px #e9ddc933;margin-bottom:34px;padding:clamp(23px,5vw,36px)}
+.entry:before{content:"✦";position:absolute;right:18px;bottom:9px;color:#c4a87177;font-size:26px}
+.entry .text{position:relative;line-height:2.1;margin:17px 0 8px}
+#cover{background:radial-gradient(circle at 50% 42%,#314e7b4d,transparent 60%);overflow:hidden;min-height:100svh;padding:45px 20px 55px}
+#cover .cover-prince{max-width:min(260px,62vw);max-height:32vh;object-fit:contain;background:#d4ebf5;border-radius:26px;padding:8px;box-shadow:0 16px 38px #0005;animation:float 5s ease-in-out infinite}
+#cover .latin{font-size:clamp(2.1rem,7vw,3rem)}
+#cover h1{font-size:clamp(1.4rem,4.5vw,1.9rem);text-shadow:0 2px 20px #0008}
+#cover p{max-width:420px}
+#letter{max-width:720px;padding-top:52px}
+.head{position:relative;padding:5px 5px 18px}
+.head-illustration{display:block;max-width:230px;max-height:180px;object-fit:contain;margin:4px auto 12px;filter:drop-shadow(0 10px 12px #0004)}
+.diary-scene{position:relative;display:flex;align-items:center;justify-content:center;margin:18px auto 22px;max-width:100%;min-height:145px;padding:8px 10px;background:radial-gradient(ellipse at center,#f2e8d8 12%,#fff9eb00 78%)}
+.diary-illustration{display:block;width:auto;max-width:100%;height:auto;max-height:260px;object-fit:contain;mix-blend-mode:multiply;filter:drop-shadow(0 8px 14px #443c2a25)}
+.ending-scene{text-align:center;padding:25px 0 8px}
+.ending-watercolor{display:block;max-height:210px;max-width:75%;object-fit:contain;margin:0 auto;opacity:.9;border-radius:10px}
+.ending-scene p{margin:8px 0;color:#f6d36b;letter-spacing:.12em;font-size:.88rem}
+#lb{padding:15px;flex-direction:column;gap:8px}#lb img{object-fit:contain;border-radius:8px}
+#lb:after{content:"點一下關閉";color:#fff7df;font-size:13px}
+@media(max-width:480px){.diary-scene{min-height:120px;margin:10px auto 18px}.diary-illustration{max-height:205px}.ending-watercolor{max-height:160px}.entry{border-radius:13px}.head-illustration{max-height:145px}#cover .cover-prince{max-height:27vh}}
+.cal{background:#0b1d3acc;border:1px solid #f6d36b55;border-radius:16px;padding:16px;margin-bottom:16px;color:#fff;box-shadow:0 10px 30px #0004}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:var(--gold);font-weight:700;letter-spacing:.12em}
+.cal-head button{font:inherit;font-size:1.3rem;line-height:1;width:36px;height:36px;border-radius:50%;border:1px solid #f6d36b88;background:transparent;color:var(--gold);cursor:pointer}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-grid .wd{font-size:.75rem;color:#9fb4cd;padding-bottom:2px}
+.day{aspect-ratio:1;border:0;background:transparent;color:#7f95b3;border-radius:10px;font:inherit;font-size:.9rem;position:relative;padding:0}
+.day.has{color:#fff;cursor:pointer;background:#ffffff18}
+.day.has:hover{background:#ffffff30}
+.day.has:after{content:"✦";position:absolute;left:0;right:0;bottom:1px;font-size:.62rem;color:var(--gold);line-height:1}
+.day.sel{background:var(--gold);color:var(--night);font-weight:700}.day.sel:after{color:#c2414a}
+.day.today{outline:1px dashed #f6d36b99}
+.cal-note{text-align:center;font-size:.75rem;color:#9fb4cd;margin-top:10px}
+.diary-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 14px;color:#c9d9ea;font-size:.85rem}
+.diary-nav button{font:inherit;font-size:.85rem;background:transparent;border:1px solid #f6d36b88;color:var(--gold);border-radius:99px;padding:6px 16px;cursor:pointer}
+.diary-nav button:disabled{opacity:.3;cursor:default}
+.diary-nav:last-of-type{margin:14px 0 0}
+.entry{margin-bottom:0}
+.pw{font:inherit;width:min(260px,70vw);padding:10px 16px;border-radius:99px;border:1px solid #f6d36b88;background:#0b1d3a99;color:#fff;text-align:center;margin:0 0 14px;position:relative;outline:none}
+.pw:focus{border-color:var(--gold)}
+.pwmsg{color:#ff9aa2;font-size:.85rem;margin-top:10px;min-height:1.2em;position:relative}
+#lb{position:fixed;inset:0;background:#0b1d3af2;display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
+#lb img{max-width:96vw;max-height:96vh}
+</style></head><body><div id="app"></div><script id="data" type="application/json">{"settings":{"to":"親愛的小叔","from":"最愛小叔的小姪女","title":"寫給你的每一天","color":"#0d2543"},"entries":[],"live":{"url":"https://vielrguzjzzhrkxgybuy.supabase.co","key":"sb_publishable_fVk3LFmv3MM1w-zNeiwi5g_cAA0Pvi6"}}</script><script>
+const PLANET_SVG = '<svg class="planet" width="190" height="190" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">' +
+  '<ellipse cx="100" cy="140" rx="96" ry="16" fill="none" stroke="#f6d36b" stroke-width="4" transform="rotate(-14 100 140)"/>' +
+  '<circle cx="100" cy="140" r="58" fill="#f6d36b"/><ellipse cx="80" cy="122" rx="20" ry="9" fill="#fff0b8" opacity=".8"/>' +
+  '<ellipse cx="124" cy="160" rx="12" ry="5" fill="#d9a93a"/>' +
+  '<path d="M100 84 V52" stroke="#4aa86b" stroke-width="3" fill="none"/>' +
+  '<path d="M100 72 q-14 -2 -16 -12 q12 0 16 12z M100 66 q12 -2 15 -11 q-11 -1 -15 11z" fill="#4aa86b"/>' +
+  '<circle cx="100" cy="44" r="11" fill="#e4565b"/><circle cx="100" cy="44" r="5" fill="#f08a8e"/>' +
+  '<path d="M82 84 V46 a18 18 0 0 1 36 0 V84" fill="#fff" fill-opacity=".14" stroke="#fff" stroke-opacity=".7" stroke-width="2"/></svg>';
+const STAR_PATH = '<svg width="S" height="S" viewBox="0 0 20 20"><path d="M10 0l2.6 7.4L20 10l-7.4 2.6L10 20l-2.6-7.4L0 10l7.4-2.6z" fill="#f6d36b"/></svg>';
+const ROSE_SVG = '<svg width="34" height="34" viewBox="0 0 40 40"><path d="M20 38C20 30 21 26 20 22" stroke="#4aa86b" stroke-width="2.2" fill="none"/><path d="M20 32q-9-1-10-8q8 0 10 8z" fill="#7fc48c" stroke="#2f6b4a"/><circle cx="20" cy="14" r="9" fill="#d9434a" stroke="#6b1f2a" stroke-width="1.2"/><path d="M14 14q6-7 12 0M16 17q4-4 8 0" stroke="#8f2a35" stroke-width="1.2" fill="none"/><circle cx="17" cy="10.5" r="2" fill="#ee858a"/></svg>';
+const PETAL_SVG = '<svg width="W" height="H" viewBox="0 0 14 18"><path d="M7 0C14 5 14 14 7 18C0 14 0 5 7 0Z" fill="#e4565b" fill-opacity=".85"/><path d="M7 3V15" stroke="#b83a43" stroke-width=".7"/></svg>';
+const DOME_SVG = '<svg width="130" height="160" viewBox="0 0 120 150"><path d="M12 138Q60 126 108 138V144Q60 152 12 144Z" fill="#7a5a78"/><path d="M60 128V72" stroke="#4aa86b" stroke-width="3.5"/><path d="M60 110q-17-2-20-16q16 0 20 16zM60 98q16-2 19-15q-15-1-19 15z" fill="#7fc48c" stroke="#2f6b4a"/><circle cx="60" cy="54" r="19" fill="#d9434a" stroke="#6b1f2a" stroke-width="1.5"/><path d="M47 54q13-14 26 0M50 60q10-9 20 0M54 47q6-4 12 0" stroke="#8f2a35" stroke-width="1.6" fill="none"/><circle cx="52" cy="46" r="4" fill="#ee858a"/><path d="M20 138V58a40 40 0 0 1 80 0V138" fill="#fff" fill-opacity=".1" stroke="#cfe3f0" stroke-width="2"/><path d="M30 60a30 30 0 0 1 14-22" stroke="#fff" stroke-opacity=".6" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M84 132q4-3 8 0q-4 3-8 0z" fill="#e4565b"/></svg>';
+const ROMAN = n => { let r = '', m = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]; for (const [v, s] of m) while (n >= v) { r += s; n -= v; } return r; };
+function viewerMain() {
+  const D = JSON.parse(document.getElementById('data').textContent), s = D.settings;
+  document.title = s.title;
+  const app = document.getElementById('app');
+  const h = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  function stars(n) {
+    const w = h('div', 'stars'); let r = 7;
+    const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < n; i++) {
+      const t = document.createElement('div'); t.innerHTML = STAR_PATH.replace(/S/g, Math.round(7 + rnd() * 14));
+      const el = t.firstChild; el.style.left = rnd() * 96 + '%'; el.style.top = rnd() * 96 + '%'; el.style.animationDelay = rnd() * 3.5 + 's';
+      w.append(el);
+    }
+    return w;
+  }
+  function petals(n) {
+    const w = h('div', 'petals'); let r = 11;
+    const rnd = () => (r = (r * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < n; i++) {
+      const t = document.createElement('div'), z = 10 + rnd() * 8;
+      t.innerHTML = PETAL_SVG.replace('W', Math.round(z)).replace('H', Math.round(z * 1.3));
+      const el = t.firstChild; el.style.left = rnd() * 96 + '%'; el.style.animationDuration = 14 + rnd() * 12 + 's'; el.style.animationDelay = -rnd() * 24 + 's';
+      w.append(el);
+    }
+    return w;
+  }
+  function musicEl(raw) {
+    let u; try { u = new URL(raw); } catch (e) { return null; }
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+    const box = h('div', 'music'), host = u.hostname.replace(/^www\.|^m\.|^music\./, '');
+    let src = '', height = 0, audio = false, m;
+    if (host === 'youtu.be') m = u.pathname.slice(1).match(/^[\w-]{6,}/);
+    else if (host === 'youtube.com') m = (u.searchParams.get('v') || (u.pathname.match(/\/(?:embed|shorts)\/([\w-]+)/) || [])[1] || '').match(/^[\w-]{6,}/);
+    if (m) { src = 'https://www.youtube.com/embed/' + m[0]; height = 220; }
+    else if (host === 'open.spotify.com' && (m = u.pathname.match(/\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/))) {
+      src = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2]; height = m[1] === 'track' || m[1] === 'episode' ? 152 : 352;
+    } else if (/\.(mp3|m4a|wav|ogg|aac)$/i.test(u.pathname)) audio = true;
+    if (audio) { const a = h('audio'); a.controls = true; a.preload = 'none'; a.src = u.href; a.style.width = '100%'; box.append(a); }
+    else if (src) {
+      const f = h('iframe'); f.src = src; f.height = height; f.loading = 'lazy'; f.allow = 'autoplay; encrypted-media; clipboard-write; fullscreen';
+      f.referrerPolicy = 'strict-origin-when-cross-origin'; box.append(f);
+    }
+    const a = h('a', '', '🎵 ' + (src || audio ? '打不開的話，點這裡聽' : '點這裡聽音樂')); a.href = u.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; box.append(a);
+    return box;
+  }
+  const svgBox = (html, cls) => { const d = h('div', cls); d.innerHTML = html; return d; };
+
+  const cover = h('div'); cover.id = 'cover';
+  const pic = (src, cls) => { const i = h('img', cls); i.src = src; return i; };
+  cover.append(svgBox(PLANET_SVG), h('div', 'latin', 'Letters to you'), h('h1', '', s.to), h('div', 'rule', '✦ ' + s.title + ' ✦'),
+    h('p', '', '每次你抬頭看星星，就會知道我在想你。'));
+  const ob = h('button', 'open', '拆開信'); cover.append(ob);
+
+  const letter = h('div'); letter.id = 'letter';
+  const head = h('div', 'head'); head.append(h('div', 'latin', 'Dear you,'), h('h1', '', s.title));
+  const cal = h('div', 'cal'), navTop = h('div', 'diary-nav'), navBot = h('div', 'diary-nav'), box = h('div');
+  const endScene = h('div', 'ending-scene');
+  endScene.append(svgBox(DOME_SVG, 'dome'), h('p', '', '你是我獨一無二的玫瑰。'));
+  letter.append(head, cal, navTop, box, navBot, endScene);
+  if (s.from) letter.append(h('div', 'sign', '— ' + s.from));
+  letter.append(h('div', 'quote', '✦ 晚安，願你有星星陪著 ✦'));
+
+  const pad = n => String(n).padStart(2, '0');
+  let selId = null, vy = 0, vm = 0;
+  function entryCard(e, n) {
+    const d = new Date(e.date + 'T00:00:00'), card = h('div', 'entry');
+    card.append(h('div', 'chap', ROMAN(n)));
+    const dt = h('div', 'dt');
+    dt.append(h('span', 'big', pad(d.getMonth() + 1) + '.' + pad(d.getDate())),
+      h('span', 'sub', d.toLocaleDateString('en-US', { weekday: 'short' }) + '. ' + d.getFullYear()), h('span', 'mood', e.mood));
+    card.append(dt);
+    if (e.art) {
+      const scene = h('div', 'diary-scene'), si = pic(e.art, 'diary-illustration');
+      si.alt = '日記插畫'; scene.append(si); card.append(scene);
+    }
+    if (e.text) card.append(h('div', 'text', e.text));
+    if (e.music) { const me = musicEl(e.music); if (me) card.append(me); }
+    if (e.audio) { const ab = h('div', 'music'), au = h('audio'); au.controls = true; au.preload = 'none'; au.src = e.audio; au.style.width = '100%'; ab.append(au, h('a', '', '🎧 ' + (e.audioName || '音檔'))); card.append(ab); }
+    if (e.images.length) {
+      const g = h('div', 'imgs');
+      for (const src of e.images) { const i = h('img'); i.src = src; i.loading = 'lazy'; i.onclick = () => { lbImg.src = src; lb.style.display = 'flex'; }; g.append(i); }
+      card.append(g);
+    }
+    return card;
+  }
+  function draw() {
+    const chrono = [...D.entries].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+    box.textContent = ''; cal.textContent = ''; navTop.textContent = ''; navBot.textContent = '';
+    cal.style.display = navTop.style.display = navBot.style.display = chrono.length ? '' : 'none';
+    if (!chrono.length) return;
+    let idx = chrono.findIndex(e => e.id === selId); if (idx < 0) idx = chrono.length - 1;
+    const cur = chrono[idx]; selId = cur.id;
+    if (!vy) { vy = +cur.date.slice(0, 4); vm = +cur.date.slice(5, 7) - 1; }
+    const pick = i => { const e = chrono[i]; selId = e.id; vy = +e.date.slice(0, 4); vm = +e.date.slice(5, 7) - 1; draw(); };
+
+    // 日曆
+    const first = new Map(); chrono.forEach((e, i) => { if (!first.has(e.date)) first.set(e.date, i); });
+    const hd = h('div', 'cal-head'), pm = h('button', '', '‹'), nm = h('button', '', '›');
+    pm.onclick = () => { vm--; if (vm < 0) { vm = 11; vy--; } draw(); };
+    nm.onclick = () => { vm++; if (vm > 11) { vm = 0; vy++; } draw(); };
+    hd.append(pm, h('span', '', vy + ' 年 ' + (vm + 1) + ' 月'), nm);
+    const grid = h('div', 'cal-grid');
+    for (const w of '日一二三四五六') grid.append(h('div', 'wd', w));
+    for (let i = new Date(vy, vm, 1).getDay(); i > 0; i--) grid.append(h('div'));
+    const todayKey = new Date().getFullYear() + '-' + pad(new Date().getMonth() + 1) + '-' + pad(new Date().getDate());
+    for (let d = 1, n = new Date(vy, vm + 1, 0).getDate(); d <= n; d++) {
+      const key = vy + '-' + pad(vm + 1) + '-' + pad(d), c = h('button', 'day', String(d));
+      c.type = 'button';
+      if (first.has(key)) { c.classList.add('has'); c.title = '看這天的日記'; c.onclick = () => { pick(first.get(key)); box.scrollIntoView({ behavior: 'smooth', block: 'start' }); }; }
+      else c.disabled = true;
+      if (key === cur.date) c.classList.add('sel');
+      if (key === todayKey) c.classList.add('today');
+      grid.append(c);
+    }
+    cal.append(hd, grid, h('div', 'cal-note', '✦ 有星星的日子，就是有寫日記'));
+
+    // 上一篇 / 下一篇
+    for (const nv of [navTop, navBot]) {
+      const pb = h('button', '', '‹ 上一篇'), nb = h('button', '', '下一篇 ›');
+      pb.disabled = idx === 0; nb.disabled = idx === chrono.length - 1;
+      pb.onclick = () => pick(idx - 1); nb.onclick = () => pick(idx + 1);
+      nv.append(pb, h('span', '', '第 ' + (idx + 1) + ' 篇 / 共 ' + chrono.length + ' 篇'), nb);
+    }
+    box.append(entryCard(cur, idx + 1));
+  }
+
+  const lb = h('div'); lb.id = 'lb'; const lbImg = h('img'); lb.append(lbImg); lb.onclick = () => lb.style.display = 'none';
+  app.append(cover, letter, lb);
+  document.body.prepend(stars(34), petals(9));
+  const openLetter = () => { cover.classList.add('gone'); letter.classList.add('show'); scrollTo(0, 0); };
+  if (D.live) {
+    let pw = ''; try { pw = localStorage.getItem('ll_view') || ''; } catch (e) {}
+    const pin = h('input', 'pw'); pin.type = 'password'; pin.placeholder = '請輸入閱讀密碼'; pin.value = pw; pin.autocomplete = 'off';
+    const msg = h('div', 'pwmsg');
+    cover.insertBefore(pin, ob); cover.append(msg);
+    let last = 0;
+    const fetchAll = async p => {
+      const r = await fetch(D.live.url + '/rest/v1/rpc/letter_read', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p }) });
+      const t = await r.text();
+      if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
+      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', music: x.music || '', art: x.art || '', images: x.images || [], audio: x.audio || '', audioName: x.audio_name || '' }));
+      last = Date.now(); pw = p; draw();
+    };
+    ob.onclick = async () => {
+      msg.textContent = '';
+      if (!pin.value) { msg.textContent = '請先輸入密碼'; return; }
+      ob.disabled = true; ob.textContent = '確認中…';
+      try {
+        await fetchAll(pin.value);
+        try { localStorage.setItem('ll_view', pin.value); } catch (e) {}
+        openLetter();
+        if (!D.entries.length) box.append(h('div', 'quote', '還沒有內容，晚點再來看看 ✦'));
+      } catch (e) { msg.textContent = e.message === 'wrong' ? '密碼不對喔' : e.message === 'closed' ? '信還沒有開放閱讀' : '暫時讀不到，請稍後再試'; }
+      ob.disabled = false; ob.textContent = '拆開信';
+    };
+    pin.onkeydown = ev => { if (ev.key === 'Enter') ob.click(); };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && pw && Date.now() - last > 120000) fetchAll(pw).catch(() => {}); });
+  } else { ob.onclick = openLetter; draw(); }
+}
+viewerMain();</script></body></html>
