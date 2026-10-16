@@ -31,7 +31,6 @@ button.open:hover{background:var(--gold);color:var(--night)}
 .sub{font-family:"Playfair Display",Georgia,serif;font-style:italic;color:var(--muted);font-size:.95rem}
 .mood{margin-left:auto;font-size:1.6rem}
 .text{white-space:pre-wrap;word-break:break-word;margin:12px 0}
-.music{margin:18px 0 6px;position:relative;z-index:1}.music iframe{display:block;width:100%;border:0;border-radius:12px}.music a{display:block;font-size:.78rem;color:var(--muted);margin-top:6px;text-decoration:none}
 .imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:14px}
 .imgs img{width:100%;border-radius:6px;cursor:zoom-in;display:block;border:6px solid #fff;box-shadow:0 3px 10px #0003}
 .imgs img:nth-child(odd){transform:rotate(-1deg)}.imgs img:nth-child(even){transform:rotate(1deg)}
@@ -126,30 +125,6 @@ function viewerMain() {
     }
     return w;
   }
-  function musicEl(raw) {
-    let u; try { u = new URL(raw); } catch (e) { return null; }
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
-    const box = h('div', 'music'), host = u.hostname.replace(/^www\.|^m\.|^music\./, '');
-    let src = '', height = 0, audio = false, m;
-    if (host === 'youtu.be') m = u.pathname.slice(1).match(/^[\w-]{6,}/);
-    else if (host === 'youtube.com') m = (u.searchParams.get('v') || (u.pathname.match(/\/(?:embed|shorts)\/([\w-]+)/) || [])[1] || '').match(/^[\w-]{6,}/);
-    if (m) { src = 'https://www.youtube.com/embed/' + m[0]; height = 220; }
-    else if (host === 'open.spotify.com' && (m = u.pathname.match(/\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/))) {
-      src = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2]; height = m[1] === 'track' || m[1] === 'episode' ? 152 : 352;
-    } else if (/(^|\.)music\.163\.com$/.test(u.hostname) && (m = (u.searchParams.get('id') || new URLSearchParams((u.hash.split('?')[1] || '')).get('id') || '').match(/^\d+$/))) {
-      const kind = /playlist/.test(u.pathname + u.hash) ? 0 : /album/.test(u.pathname + u.hash) ? 1 : 2;
-      src = 'https://music.163.com/outchain/player?type=' + kind + '&id=' + m[0] + '&auto=0&height=' + (kind === 2 ? 66 : 430); height = kind === 2 ? 86 : 450;
-    } else if (host === 'bilibili.com' && (m = u.pathname.match(/\/video\/(BV[0-9A-Za-z]+)/))) {
-      src = 'https://player.bilibili.com/player.html?bvid=' + m[1] + '&page=1&high_quality=1&autoplay=0'; height = 300;
-    } else if (/\.(mp3|m4a|wav|ogg|aac)$/i.test(u.pathname)) audio = true;
-    if (audio) { const a = h('audio'); a.controls = true; a.preload = 'none'; a.src = u.href; a.style.width = '100%'; box.append(a); }
-    else if (src) {
-      const f = h('iframe'); f.src = src; f.height = height; f.loading = 'lazy'; f.allow = 'autoplay; encrypted-media; clipboard-write; fullscreen';
-      f.referrerPolicy = 'strict-origin-when-cross-origin'; box.append(f);
-    }
-    const a = h('a', '', '🎵 ' + (src || audio ? '打不開的話，點這裡聽' : '點這裡聽音樂')); a.href = u.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; box.append(a);
-    return box;
-  }
   const svgBox = (html, cls) => { const d = h('div', cls); d.innerHTML = html; return d; };
 
   const cover = h('div'); cover.id = 'cover';
@@ -181,7 +156,6 @@ function viewerMain() {
       si.alt = '日記插畫'; scene.append(si); card.append(scene);
     }
     if (e.text) card.append(h('div', 'text', e.text));
-    if (e.music) { const me = musicEl(e.music); if (me) card.append(me); }
     if (e.audio || e.audioRemote) card.append(h('div', 'bgm-note', '🎵 這篇有背景音樂' + (e.audioName ? '：' + e.audioName : '')));
     if (e.images.length) {
       const g = h('div', 'imgs');
@@ -283,7 +257,7 @@ function viewerMain() {
       const r = await fetch(D.live.url + '/rest/v1/rpc/letter_read', { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p }) });
       const t = await r.text();
       if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
-      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', music: x.music || '', art: x.art || '', images: x.images || [], audio: '', audioRemote: !!x.has_audio, audioKb: x.audio_kb || 0, audioName: x.audio_name || '' }));
+      D.entries = JSON.parse(t).map(x => ({ id: x.id, date: x.entry_date, mood: x.mood || '', text: x.body || '', art: x.art || '', images: x.images || [], audio: '', audioRemote: !!x.has_audio, audioKb: x.audio_kb || 0, audioName: x.audio_name || '' }));
       last = Date.now(); pw = p; draw();
     };
     ob.onclick = async () => {
