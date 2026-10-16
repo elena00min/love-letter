@@ -311,30 +311,42 @@ function viewerMain() {
       return JSON.parse(await r.text());
     };
     const rpcV = async (p, fn, args) => {
-      const r = await fetch(D.live.url + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p, ...args }) });
-      const t = await r.text();
-      if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
-      return JSON.parse(t);
+      for (let k = 1; ; k++) {
+        const ac = new AbortController(), timer = setTimeout(() => ac.abort(), 20000);
+        try {
+          const r = await fetch(D.live.url + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: D.live.key, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_view: p, ...args }), signal: ac.signal });
+          const t = await r.text(); clearTimeout(timer);
+          if (!r.ok) throw new Error(/wrong password/.test(t) ? 'wrong' : /no view password/.test(t) ? 'closed' : 'fail');
+          return JSON.parse(t);
+        } catch (e) {
+          clearTimeout(timer);
+          if (e.message === 'wrong' || e.message === 'closed' || k >= 2) throw (e.name === 'AbortError' ? new Error('slow') : e);
+        }
+      }
     };
     monthLoader = m => rpcV(pw, 'letter_month', { p_month: m });
     const fetchAll = async p => {
-      const idx = await rpcV(p, 'letter_index', {});
-      pw = p; D.index = idx.map(x => ({ id: x.id, date: x.date })); D.entries = []; monthLoaded.clear(); monthFail.clear();
-      const sel = D.index.find(x => x.id === selId) || D.index[D.index.length - 1];
-      if (sel) await loadMonth(sel.date.slice(0, 7));
+      const s = await rpcV(p, 'letter_start', {});
+      pw = p; D.index = s.index.map(x => ({ id: x.id, date: x.date })); D.entries = []; monthLoaded.clear(); monthFail.clear();
+      if (s.month) { D.entries = s.rows.map(mapEntry); monthLoaded.add(s.month); }
       last = Date.now(); draw();
     };
     ob.onclick = async () => {
-      msg.textContent = '';
+      msg.textContent = ''; msg.style.color = '';
       if (!pin.value) { msg.textContent = '請先輸入密碼'; return; }
-      unlockBgm(); ob.disabled = true; ob.textContent = '確認中…';
+      unlockBgm(); ob.disabled = true; ob.textContent = '連線中…';
+      const slowT = setTimeout(() => { msg.style.color = '#f6d36b'; msg.textContent = '網路有點慢，還在連線，請再等一下…'; }, 6000);
       try {
         await fetchAll(pin.value);
         try { localStorage.setItem('ll_view', pin.value); } catch (e) {}
+        msg.textContent = '';
         openLetter();
         if (!D.entries.length) box.append(h('div', 'quote', '還沒有內容，晚點再來看看 ✦'));
-      } catch (e) { msg.textContent = e.message === 'wrong' ? '密碼不對喔' : e.message === 'closed' ? '信還沒有開放閱讀' : '暫時讀不到，請稍後再試'; }
-      ob.disabled = false; ob.textContent = '拆開信';
+      } catch (e) {
+        msg.style.color = '';
+        msg.textContent = e.message === 'wrong' ? '密碼不對喔' : e.message === 'closed' ? '信還沒有開放閱讀' : e.message === 'slow' ? '連線逾時了，請再按一次「拆開信」' : '暫時讀不到，請稍後再試';
+      }
+      clearTimeout(slowT); ob.disabled = false; ob.textContent = '拆開信';
     };
     pin.onkeydown = ev => { if (ev.key === 'Enter') ob.click(); };
     document.addEventListener('visibilitychange', () => { if (!document.hidden && pw && Date.now() - last > 120000) fetchAll(pw).catch(() => {}); });
